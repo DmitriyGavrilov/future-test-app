@@ -1,3 +1,6 @@
 .ItemList {
     margin-top: 20px;
 }
+.Tr th {
+    cursor: pointer;
+}

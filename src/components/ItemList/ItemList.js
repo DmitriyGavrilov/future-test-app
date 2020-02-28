@@ -6,7 +6,12 @@ import Item from '../Item/Item';
 export default class ItemList extends Component {
 
     state = {
-        peopleList: null
+        peopleList: null,
+        sortId: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        phone: true
     };
 
     fetchService = new FetchService;
@@ -23,29 +28,85 @@ export default class ItemList extends Component {
             })
         });
     }
-
-    sortMethod = () => {
+    sortUpMethod = (name) => {
+        if (this.state.peopleList !== null) {
         const sortedPerson = this.state.peopleList.sort(function(a,b){
-            return a.id - b.id;
-          });
-        this.setState({
-             peopleList: sortedPerson
+            return a[name] - b[name];
         });
+        this.setState({
+             peopleList: sortedPerson,
+             sortId: !this.state.sortId
+        });
+        }
+    };
+
+    sortDownMethod = (name) => {
+        if (this.state.peopleList !== null) {
+        const sortedPerson = this.state.peopleList.sort(function(a,b){
+            return b[name] - a[name];
+        });
+        this.setState({
+             peopleList: sortedPerson,
+             sortId: !this.state.sortId
+        });
+        }
+    };
+
+    sortUpStrMethod = (name) => {
+        if (this.state.peopleList !== null) {
+        const sortedPerson = this.state.peopleList.sort(function(a,b){
+            let nameA=a[name].toLowerCase(), nameB=b[name].toLowerCase();
+            if (nameA < nameB) {
+                return -1;
+            }
+            if (nameA > nameB) {
+                return 1;
+            }
+            return 0; 
+        });
+        this.setState({
+             peopleList: sortedPerson,
+             [name]: !this.state[name]
+        });
+        }
+    };
+
+    sortDownStrMethod = (name) => {
+        if (this.state.peopleList !== null) {
+        const sortedPerson = this.state.peopleList.sort(function(a,b){
+            let nameA=a[name].toLowerCase(), nameB=b[name].toLowerCase();
+            if (nameA > nameB) {
+                return -1;
+            }
+            if (nameA < nameB) {
+                return 1;
+            }
+            return 0; 
+        });
+        this.setState({
+             peopleList: sortedPerson,
+             [name]: !this.state[name]
+        });
+        }
     };
 
     render() {
         // console.log(this.state.peopleList);
+        const angleUp =  <i className="fa fa-angle-up"></i>;
+        const angleDown =  <i className="fa fa-angle-down"></i>;
+
         return (
         <div className={classes.ItemList}>
             <table className="table">
                 <thead>
-                    <tr>
+                    <tr className={classes.Tr}>
                         <th scope="col">#</th>
-                        <th onClick={this.sortMethod} scope="col">id</th>
-                        <th scope="col">First</th>
-                        <th scope="col">Last</th>
-                        <th scope="col">Email</th>
-                        <th scope="col">Phone</th>
+                        <th onClick={this.state.sortId ? () => this.sortUpMethod('id'): () => this.sortDownMethod('id')} 
+                            scope="col">id {this.state.sortId ? angleDown : angleUp}</th>
+                        <th onClick={this.state['firstName'] ? () => this.sortUpStrMethod('firstName') : () => this.sortDownStrMethod('firstName')} scope="col">First {this.state['firstName'] ? angleDown : angleUp}</th>
+                        <th onClick={this.state['lastName'] ? () => this.sortUpStrMethod('lastName') : () => this.sortDownStrMethod('lastName')} scope="col">Last {this.state['lastName'] ? angleDown : angleUp}</th>
+                        <th onClick={this.state['email'] ? () => this.sortUpStrMethod('email') : () => this.sortDownStrMethod('email')} scope="col">Email {this.state['email'] ? angleDown : angleUp}</th>
+                        <th onClick={this.state['phone'] ? () => this.sortUpStrMethod('phone') : () => this.sortDownStrMethod('phone')} scope="col">Phone {this.state['phone'] ? angleDown : angleUp}</th>
                     </tr>
                 </thead>
                 <tbody>
