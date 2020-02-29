@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import classes from './ItemList.module.css';
 import FetchService from '../../services/fetch-service';
 import Item from '../Item/Item';
+import Loading from '../Loading/Loading';
 
 export default class ItemList extends Component {
 
@@ -11,18 +12,19 @@ export default class ItemList extends Component {
         firstName: true,
         lastName: true,
         email: true,
-        phone: true
+        phone: true,
+        showInputs: false
     };
 
-    fetchService = new FetchService;
+    fetchService = new FetchService();
 
-    constructor() {
+    constructor(props) {
         super();
-        this.getPerson();
+        this.getPerson(props.quantity);
     }
 
-    getPerson() {
-        this.fetchService.getAllObjects().then((person) => {
+    getPerson = (quantity) => {
+        this.fetchService.getAllObjects(quantity).then((person) => {
             this.setState({
                 peopleList: person
             })
@@ -31,8 +33,15 @@ export default class ItemList extends Component {
     sortUpMethod = (name) => {
         if (this.state.peopleList !== null) {
         const sortedPerson = this.state.peopleList.sort(function(a,b){
-            return a[name] - b[name];
+            if (a[name] < b[name]) {
+                return -1;
+            }
+            if (a[name] > b[name]) {
+                return 1;
+            }
+            return 0; 
         });
+        console.log(this.state.peopleList);
         this.setState({
              peopleList: sortedPerson,
              sortId: !this.state.sortId
@@ -43,8 +52,15 @@ export default class ItemList extends Component {
     sortDownMethod = (name) => {
         if (this.state.peopleList !== null) {
         const sortedPerson = this.state.peopleList.sort(function(a,b){
-            return b[name] - a[name];
+            if (a[name] > b[name]) {
+                return -1;
+            }
+            if (a[name] < b[name]) {
+                return 1;
+            }
+            return 0; 
         });
+        console.log(this.state.peopleList);
         this.setState({
              peopleList: sortedPerson,
              sortId: !this.state.sortId
@@ -90,6 +106,12 @@ export default class ItemList extends Component {
         }
     };
 
+    showInputs = () => {
+        this.setState({
+            showInputs: true
+        })
+    }
+
     render() {
         // console.log(this.state.peopleList);
         const angleUp =  <i className="fa fa-angle-up"></i>;
@@ -97,6 +119,13 @@ export default class ItemList extends Component {
 
         return (
         <div className={classes.ItemList}>
+            <button onClick={this.showInputs}>Добавить</button>
+            {this.state.showInputs ? <div className={classes.Inputs}>
+                <input type="text" />
+                <input type="text" />
+                <input type="text" />
+                <input type="text" />
+                <input type="text" /></div> : null}
             <table className="table">
                 <thead>
                     <tr className={classes.Tr}>
@@ -113,14 +142,14 @@ export default class ItemList extends Component {
                         {this.state.peopleList !== null ? this.state.peopleList.map((person, index) => {
                             index = ++index;
                              return <Item
-                             key={person.id}
+                             key={person.id + Math.random()}
                              index={index}
                              id={person.id}
                              firstName={person.firstName} 
                              lastName={person.lastName} 
                              email={person.email} 
                              phone={person.phone} />
-                        }) : <tr><th>Loading ...</th></tr>}
+                        }) : <tr><th>Loading <Loading /></th></tr>}
                 </tbody>
             </table>
         </div>)
