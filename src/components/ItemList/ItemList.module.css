@@ -12,3 +12,7 @@
     margin: 0 10px;
     width: calc(100%/5 - 20px);
 }
+.Input {
+    margin: 0 20px;
+    height: 35px;
+}

@@ -7,13 +7,18 @@ import Loading from '../Loading/Loading';
 export default class ItemList extends Component {
 
     state = {
+        peopleLargeList: null,
+        numForShow: 0,
         peopleList: null,
         sortId: true,
         firstName: true,
         lastName: true,
         email: true,
         phone: true,
-        showInputs: false
+        showInputs: false,
+        showMore: false,
+        allPeopleList: null,
+        showWarning: false,
     };
 
     fetchService = new FetchService();
@@ -25,6 +30,16 @@ export default class ItemList extends Component {
 
     getPerson = (quantity) => {
         this.fetchService.getAllObjects(quantity).then((person) => {
+            if (quantity === 1000) {
+                this.setState({
+                    peopleLargeList: person
+                });
+                person = person.slice(0, 50);
+                this.setState({
+                    showMore: true,
+                    numForShow: 100
+                })
+            }
             this.setState({
                 peopleList: person
             })
@@ -112,6 +127,69 @@ export default class ItemList extends Component {
         })
     }
 
+    showMorePeople = () => {
+        // console.log('[ItemList.js] ', this.state.peopleList);
+        // console.log('[ItemList.js] ', this.state.peopleLargeList);
+        if (this.state.peopleList.length !== 1000 ) {
+            const person = this.state.peopleLargeList.slice(0, this.state.numForShow);
+            const numForPlus = this.state.numForShow + 50;
+            this.setState({
+                peopleList: person,
+                numForShow: numForPlus
+            });
+        } else {
+            this.setState({
+                showMore: false
+            })
+        }
+    }
+
+    searchBtn = () => {
+        let inputVal = document.getElementById('inputForSearch').value;
+        let itemsList = this.state.peopleList;
+        console.log('[ItemList.js] inputVal', inputVal);
+        if (this.state.peopleLargeList) {
+            itemsList = this.state.peopleLargeList;
+            // allItemsList = this.state.peopleLargeList;
+        }
+        let filteredItems = itemsList.filter((item) => {
+            return item.firstName.toLowerCase().indexOf(inputVal.toLowerCase()) > -1;
+        });
+        // console.log('[ItemList.js] event.target.value', event.target.value);
+        if ( inputVal ) {
+            this.setState({
+                peopleList: filteredItems,
+                showWarning: false,
+                showMore: false
+            });
+            // console.log('[ItemList.js] if', this.state.peopleList);  
+        } else {
+            this.setState({
+                showWarning: true,
+            })
+            // console.log('[ItemList.js] else', this.state.peopleList);
+        }
+    }
+    clearSearch = () => {
+        this.getPerson(this.props.quantity);
+        document.getElementById('inputForSearch').value = '';
+    }
+
+    // addItem = (text) => {
+    //     const newItem = this.createTodoItem(text);        
+
+    //     this.setState(({todoData}) => {
+    //         const newArr = [
+    //             ...todoData, 
+    //             newItem
+    //         ];
+            
+    //         return {
+    //             todoData: newArr
+    //         }
+    //     });
+    // };
+
     render() {
         // console.log(this.state.peopleList);
         const angleUp =  <i className="fa fa-angle-up"></i>;
@@ -120,12 +198,16 @@ export default class ItemList extends Component {
         return (
         <div className={classes.ItemList}>
             <button onClick={this.showInputs}>Добавить</button>
+            <input className={classes.Input} id='inputForSearch' type="text"  placeholder="введите текст" />
+            <button onClick={this.searchBtn}>Найти</button>
+            <button onClick={this.clearSearch}>Сбросить</button>
             {this.state.showInputs ? <div className={classes.Inputs}>
                 <input type="text" />
                 <input type="text" />
                 <input type="text" />
                 <input type="text" />
                 <input type="text" /></div> : null}
+                {this.state.showWarning ? <div className="alert alert-danger" role="alert">Введите текст!</div> : null}
             <table className="table">
                 <thead>
                     <tr className={classes.Tr}>
@@ -152,6 +234,7 @@ export default class ItemList extends Component {
                         }) : <tr><th>Loading <Loading /></th></tr>}
                 </tbody>
             </table>
+            {this.state.showMore ? <button onClick={this.showMorePeople}>Показать ещё</button> : null}
         </div>)
     }
 }
