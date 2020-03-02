@@ -147,14 +147,38 @@ export default class ItemList extends Component {
     searchBtn = () => {
         let inputVal = document.getElementById('inputForSearch').value;
         let itemsList = this.state.peopleList;
-        console.log('[ItemList.js] inputVal', inputVal);
+        // console.log('[ItemList.js] inputVal', inputVal);
         if (this.state.peopleLargeList) {
             itemsList = this.state.peopleLargeList;
             // allItemsList = this.state.peopleLargeList;
         }
         let filteredItems = itemsList.filter((item) => {
+            return String(item.id).indexOf(inputVal) > -1;
+        });
+        filteredItems ? filteredItems = [...filteredItems, itemsList.filter((item) => {
+            return item.firstName.toLowerCase().indexOf(inputVal.toLowerCase()) > -1;
+        })] :
+        filteredItems = itemsList.filter((item) => {
             return item.firstName.toLowerCase().indexOf(inputVal.toLowerCase()) > -1;
         });
+        // filteredItems ? filteredItems = [...filteredItems, itemsList.filter((item) => {
+        //     return item.lastName.toLowerCase().indexOf(inputVal.toLowerCase()) > -1;
+        // })] :
+        // filteredItems = filteredItems, itemsList.filter((item) => {
+        //     return item.lastName.toLowerCase().indexOf(inputVal.toLowerCase()) > -1;
+        // });
+        // filteredItems ? filteredItems = [...filteredItems, itemsList.filter((item) => {
+        //     return item.email.toLowerCase().indexOf(inputVal.toLowerCase()) > -1;
+        // })] :
+        // filteredItems = [...filteredItems, itemsList.filter((item) => {
+        //     return item.email.toLowerCase().indexOf(inputVal.toLowerCase()) > -1;
+        // })];
+        // filteredItems ? filteredItems = [...filteredItems, itemsList.filter((item) => {
+        //     return item.phone.indexOf(inputVal) > -1;
+        // })] :
+        // filteredItems = [...filteredItems, itemsList.filter((item) => {
+        //     return item.phone.indexOf(inputVal) > -1;
+        // })];
         // console.log('[ItemList.js] event.target.value', event.target.value);
         if ( inputVal ) {
             this.setState({
