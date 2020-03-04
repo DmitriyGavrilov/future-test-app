@@ -155,30 +155,31 @@ export default class ItemList extends Component {
         let filteredItems = itemsList.filter((item) => {
             return String(item.id).indexOf(inputVal) > -1;
         });
-        filteredItems ? filteredItems = [...filteredItems, itemsList.filter((item) => {
-            return item.firstName.toLowerCase().indexOf(inputVal.toLowerCase()) > -1;
-        })] :
-        filteredItems = itemsList.filter((item) => {
-            return item.firstName.toLowerCase().indexOf(inputVal.toLowerCase()) > -1;
-        });
-        // filteredItems ? filteredItems = [...filteredItems, itemsList.filter((item) => {
-        //     return item.lastName.toLowerCase().indexOf(inputVal.toLowerCase()) > -1;
-        // })] :
-        // filteredItems = filteredItems, itemsList.filter((item) => {
-        //     return item.lastName.toLowerCase().indexOf(inputVal.toLowerCase()) > -1;
-        // });
-        // filteredItems ? filteredItems = [...filteredItems, itemsList.filter((item) => {
-        //     return item.email.toLowerCase().indexOf(inputVal.toLowerCase()) > -1;
-        // })] :
-        // filteredItems = [...filteredItems, itemsList.filter((item) => {
-        //     return item.email.toLowerCase().indexOf(inputVal.toLowerCase()) > -1;
-        // })];
-        // filteredItems ? filteredItems = [...filteredItems, itemsList.filter((item) => {
-        //     return item.phone.indexOf(inputVal) > -1;
-        // })] :
-        // filteredItems = [...filteredItems, itemsList.filter((item) => {
-        //     return item.phone.indexOf(inputVal) > -1;
-        // })];
+        const filterFunc = (name) => {
+            if (filteredItems[0] !==  undefined){
+                filteredItems = filteredItems.concat(itemsList.filter((item) => {
+                    if (typeof(item[name]) == "number") {
+                        return item[name].indexOf(inputVal) > -1;
+                    } else {
+                        return item[name].toLowerCase().indexOf(inputVal.toLowerCase()) > -1;
+                    }
+                }))
+            } else {
+                filteredItems =  itemsList.filter((item) => {
+                    if (typeof(item[name]) == "number") {
+                        return item[name].indexOf(inputVal) > -1;
+                    } else {
+                        return item[name].toLowerCase().indexOf(inputVal.toLowerCase()) > -1;
+                    }
+                });
+            }
+        };
+        const arrOfNames =['firstName', 'lastName', 'email', 'phone'];
+        let i = 0;
+        while (arrOfNames[i]) {
+            filterFunc(arrOfNames[i]);
+            i++;
+        }
         // console.log('[ItemList.js] event.target.value', event.target.value);
         if ( inputVal ) {
             this.setState({
@@ -221,7 +222,7 @@ export default class ItemList extends Component {
 
         return (
         <div className={classes.ItemList}>
-            <button onClick={this.showInputs}>Добавить</button>
+            {/* <button onClick={this.showInputs}>Добавить</button> */}
             <input className={classes.Input} id='inputForSearch' type="text"  placeholder="введите текст" />
             <button onClick={this.searchBtn}>Найти</button>
             <button onClick={this.clearSearch}>Сбросить</button>
